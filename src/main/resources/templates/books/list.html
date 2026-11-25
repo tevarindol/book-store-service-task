@@ -1,0 +1,109 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" th:lang="#{locale.tag}">
+  <head th:replace="~{fragments/layout :: head(#{app.title})}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <main class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+      <section class="max-w-3xl py-10 sm:py-14">
+        <h1
+          class="text-3xl font-semibold tracking-tight text-stone-900 sm:text-4xl"
+          th:text="#{nav.catalog}"
+        >
+          Catalog
+        </h1>
+      </section>
+      <form class="mb-10 flex max-w-xl gap-3" method="get" th:action="@{/books}">
+        <input
+          class="min-w-0 flex-1 rounded-lg border border-stone-300 bg-white px-4 py-3 text-stone-900 shadow-sm outline-none focus:border-emerald-700 focus:ring-2 focus:ring-emerald-100"
+          name="q"
+          th:value="${query}"
+          th:placeholder="#{book.search}"
+        >
+        <button
+          class="rounded-lg bg-emerald-800 px-5 py-3 font-semibold text-white shadow-sm hover:bg-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2"
+          th:text="#{book.searchButton}"
+        >
+          Search
+        </button>
+      </form>
+      <p
+        class="mb-6 rounded-lg bg-emerald-50 px-4 py-3 text-emerald-900"
+        th:if="${param.logout}"
+        th:text="#{nav.logout}"
+      ></p>
+      <p
+        class="mb-6 rounded-lg bg-emerald-50 px-4 py-3 text-emerald-900"
+        th:if="${param.accountDeleted}"
+        th:text="#{account.deleted}"
+      ></p>
+      <div
+        class="grid grid-cols-1 gap-5 pb-16 sm:grid-cols-2 lg:grid-cols-3"
+        th:if="${!books.isEmpty()}"
+      >
+        <article
+          class="flex flex-col rounded-xl border border-stone-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+          th:each="book : ${books}"
+        >
+          <p
+            class="text-xs font-semibold uppercase tracking-wider text-amber-700"
+            th:text="${book.author}"
+          >
+            Author
+          </p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-stone-900">
+            <a
+              class="hover:text-emerald-800"
+              th:href="@{/books/{id}(id=${book.id})}"
+              th:text="${book.title}"
+            >
+              Book title
+            </a>
+          </h2>
+          <p
+            class="mt-3 line-clamp-3 text-sm leading-6 text-stone-600"
+            th:text="${book.description}"
+          >
+            Description
+          </p>
+          <div class="mt-auto flex items-center justify-between gap-3 pt-6">
+            <strong
+              class="text-lg text-stone-900"
+              th:text="${#numbers.formatDecimal(book.price, 1, 2)} + ' ₴'"
+            >
+              0.00
+            </strong>
+            <span
+              th:if="${book.stockQuantity > 0}"
+              class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800"
+              th:text="#{book.stock}"
+            >
+              In stock
+            </span>
+            <span
+              th:unless="${book.stockQuantity > 0}"
+              class="rounded-full bg-stone-100 px-3 py-1 text-xs font-semibold text-stone-500"
+              th:text="#{book.outOfStock}"
+            >
+              Out of stock
+            </span>
+          </div>
+          <a
+            class="mt-5 inline-flex w-fit items-center rounded-lg border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-700 hover:border-emerald-800 hover:text-emerald-800"
+            th:href="@{/books/{id}(id=${book.id})}"
+            th:text="#{book.details}"
+          >
+            Details
+          </a>
+        </article>
+      </div>
+      <p
+        th:if="${books.isEmpty()}"
+        class="rounded-xl border border-dashed border-stone-300 bg-white px-6 py-12 text-center text-stone-500"
+        th:text="#{common.empty}"
+      >
+        No books found.
+      </p>
+    </main>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+  </body>
+</html>

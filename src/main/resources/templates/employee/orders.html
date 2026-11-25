@@ -1,0 +1,67 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" th:lang="#{locale.tag}">
+  <head th:replace="~{fragments/layout :: head(#{employee.orders})}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <main class="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+      <h1 class="text-3xl font-semibold tracking-tight text-stone-900" th:text="#{employee.orders}">
+        Manage orders
+      </h1>
+      <p
+        class="my-5 rounded-lg bg-emerald-50 px-4 py-3 text-emerald-900"
+        th:if="${notice}"
+        th:text="${#messages.msg(notice)}"
+      ></p>
+      <p
+        class="my-8 rounded-xl border border-dashed border-stone-300 bg-white px-6 py-12 text-center text-stone-500"
+        th:if="${orders.isEmpty()}"
+        th:text="#{common.empty}"
+      ></p>
+      <section
+        class="mt-6 rounded-xl border border-stone-200 bg-white p-6 shadow-sm"
+        th:each="order : ${orders}"
+      >
+        <div class="flex flex-wrap items-center gap-3 border-b border-stone-100 pb-4">
+          <strong
+            class="text-stone-900"
+            th:text="${'#' + order.id + ' · ' + order.customer.firstName + ' ' + order.customer.lastName}"
+          ></strong>
+          <span
+            class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800"
+            th:text="${#messages.msg('orders.status.' + #strings.toLowerCase(order.status.name()))}"
+          ></span>
+          <span
+            class="ml-auto text-sm text-stone-500"
+            th:text="${#temporals.format(order.createdAt, #messages.msg('date.timeFormat'))}"
+          ></span>
+        </div>
+        <ul class="my-4 space-y-2 text-sm text-stone-600">
+          <li
+            th:each="item : ${order.items}"
+            th:text="${item.bookTitle + ' × ' + item.quantity + ' — ' + #numbers.formatDecimal(item.subtotal, 1, 2) + ' ₴'}"
+          ></li>
+        </ul>
+        <p
+          class="mb-4 font-semibold text-stone-900"
+          th:text="${#messages.msg('employee.orderTotal', #numbers.formatDecimal(order.total, 1, 2) + ' ₴')}"
+        ></p>
+        <form
+          th:if="${order.status.name() == 'SUBMITTED'}"
+          th:action="@{/employee/orders/{id}/confirm(id=${order.id})}"
+          method="post"
+        >
+          <button
+            class="rounded-lg bg-emerald-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-900"
+            th:text="#{employee.confirm}"
+          ></button>
+        </form>
+      </section>
+      <a
+        class="mt-6 inline-block text-sm text-stone-500 hover:text-emerald-800"
+        th:href="@{/employee}"
+        th:text="'← ' + #{common.back}"
+      ></a>
+    </main>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+  </body>
+</html>

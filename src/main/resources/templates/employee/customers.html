@@ -1,0 +1,60 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" th:lang="#{locale.tag}">
+  <head th:replace="~{fragments/layout :: head(#{employee.customers})}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <main class="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+      <h1
+        class="text-3xl font-semibold tracking-tight text-stone-900"
+        th:text="#{employee.customers}"
+      >
+        Customers
+      </h1>
+      <div class="mt-7 overflow-x-auto rounded-xl border border-stone-200 bg-white shadow-sm">
+        <table class="w-full min-w-[680px] text-left text-sm">
+          <thead class="bg-stone-50 text-xs uppercase tracking-wide text-stone-500">
+            <tr>
+              <th class="px-4 py-3" th:text="#{common.name}"></th>
+              <th class="px-4 py-3" th:text="#{auth.email}"></th>
+              <th class="px-4 py-3" th:text="#{auth.phone}"></th>
+              <th class="px-4 py-3" th:text="#{employee.customerStatus}"></th>
+              <th class="px-4 py-3" th:text="#{common.actions}"></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-stone-100">
+            <tr th:each="customer : ${customers}">
+              <td
+                class="px-4 py-3 font-medium text-stone-900"
+                th:text="${customer.firstName + ' ' + customer.lastName}"
+              ></td>
+              <td class="px-4 py-3 text-stone-600" th:text="${customer.email}"></td>
+              <td class="px-4 py-3 text-stone-600" th:text="${customer.phone}"></td>
+              <td
+                class="px-4 py-3 text-stone-600"
+                th:text="${customer.blocked ? #messages.msg('employee.customerBlocked') : #messages.msg('employee.customerActive')}"
+              ></td>
+              <td class="px-4 py-3">
+                <form
+                  th:action="@{/employee/customers/{id}/block(id=${customer.id})}"
+                  method="post"
+                >
+                  <button
+                    class="rounded-md px-3 py-2 text-xs font-semibold text-white"
+                    th:classappend="${customer.blocked ? 'bg-emerald-800 hover:bg-emerald-900' : 'bg-red-700 hover:bg-red-800'}"
+                    th:text="${customer.blocked ? #messages.msg('employee.unblock') : #messages.msg('employee.block')}"
+                  ></button>
+                </form>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <a
+        class="mt-6 inline-block text-sm text-stone-500 hover:text-emerald-800"
+        th:href="@{/employee}"
+        th:text="'← ' + #{common.back}"
+      ></a>
+    </main>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+  </body>
+</html>

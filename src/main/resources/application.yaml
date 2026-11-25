@@ -1,3 +1,58 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
   application:
     name: book-store-service-task
+  datasource:
+    url: jdbc:h2:mem:bookstore;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+  flyway:
+    enabled: true
+  thymeleaf:
+    cache: false
+  messages:
+    basename: messages
+    encoding: UTF-8
+  mvc:
+    problemdetails:
+      enabled: true
+app:
+  basket:
+    session-attribute: bookstoreBasket
+  security:
+    bcrypt-strength: 12
+    jwt:
+      secret: ${JWT_SECRET}
+      issuer: book-store-service-task
+      cookie-name: BOOKSTORE_AUTH
+      access-token-ttl: 15m
+      secure-cookie: ${JWT_COOKIE_SECURE:false}
+server:
+  error:
+    include-message: never
+    include-stacktrace: never
+logging:
+  level:
+    dev.is_a.tevarindol.bookstore: INFO
+
+---
+spring:
+  config:
+    activate:
+      on-profile: postgres
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_DATABASE:bookstore}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect

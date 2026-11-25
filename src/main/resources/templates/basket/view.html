@@ -1,0 +1,96 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" th:lang="#{locale.tag}">
+  <head th:replace="~{fragments/layout :: head(#{basket.title})}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <main class="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+      <h1 class="text-3xl font-semibold tracking-tight text-stone-900" th:text="#{basket.title}">
+        Your basket
+      </h1>
+      <p
+        class="my-5 rounded-lg bg-red-50 px-4 py-3 text-red-800"
+        th:if="${error}"
+        th:text="${#messages.msg(error)}"
+      ></p>
+      <p
+        class="my-5 rounded-lg bg-emerald-50 px-4 py-3 text-emerald-900"
+        th:if="${notice}"
+        th:text="${#messages.msg(notice)}"
+      ></p>
+      <p
+        class="my-8 rounded-xl border border-dashed border-stone-300 bg-white px-6 py-12 text-center text-stone-500"
+        th:if="${lines.isEmpty()}"
+        th:text="#{basket.empty}"
+      >
+        Your basket is empty.
+      </p>
+      <div class="mt-8" th:unless="${lines.isEmpty()}">
+        <div class="overflow-x-auto rounded-xl border border-stone-200 bg-white shadow-sm">
+          <table class="w-full min-w-[600px] text-left text-sm">
+            <thead class="bg-stone-50 text-xs uppercase tracking-wide text-stone-500">
+              <tr>
+                <th class="px-5 py-4" th:text="#{common.name}">Book</th>
+                <th class="px-5 py-4" th:text="#{basket.quantity}">Quantity</th>
+                <th class="px-5 py-4" th:text="#{basket.subtotal}">Subtotal</th>
+                <th class="px-5 py-4"></th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-stone-100">
+              <tr th:each="line : ${lines}">
+                <td class="px-5 py-4 font-medium text-stone-900">
+                  <a
+                    class="hover:text-emerald-800"
+                    th:href="@{/books/{id}(id=${line.book.id})}"
+                    th:text="${line.book.title}"
+                  ></a>
+                </td>
+                <td class="px-5 py-4 text-stone-600" th:text="${line.quantity}"></td>
+                <td
+                  class="px-5 py-4 font-medium text-stone-900"
+                  th:text="${#numbers.formatDecimal(line.subtotal, 1, 2)} + ' ₴'"
+                ></td>
+                <td class="px-5 py-4">
+                  <form th:action="@{/basket/{id}/remove(id=${line.book.id})}" method="post">
+                    <button
+                      class="rounded-md border border-stone-300 px-3 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50"
+                      th:text="#{basket.remove}"
+                    >
+                      Remove
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="mt-6 flex flex-col items-end gap-4">
+          <p class="text-lg text-stone-700">
+            <span th:text="#{basket.total}">Total</span>:
+            <strong
+              class="text-xl text-stone-950"
+              th:text="${#numbers.formatDecimal(total, 1, 2)} + ' ₴'"
+            ></strong>
+          </p>
+          <form th:action="@{/checkout}" method="post">
+            <button
+              class="rounded-lg bg-emerald-800 px-5 py-3 font-semibold text-white hover:bg-emerald-900"
+              th:text="#{basket.checkout}"
+            >
+              Submit order
+            </button>
+          </form>
+        </div>
+      </div>
+      <p class="mt-8">
+        <a
+          class="text-sm font-medium text-stone-500 hover:text-emerald-800"
+          th:href="@{/books}"
+          th:text="'← ' + #{common.back}"
+        >
+          Continue browsing
+        </a>
+      </p>
+    </main>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+  </body>
+</html>

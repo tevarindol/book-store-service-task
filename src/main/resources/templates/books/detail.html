@@ -1,0 +1,74 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" th:lang="#{locale.tag}">
+  <head th:replace="~{fragments/layout :: head(${book.title})}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <main class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+      <a
+        class="mt-8 inline-flex text-sm font-medium text-stone-500 hover:text-emerald-800"
+        th:href="@{/books}"
+        th:text="'← ' + #{common.back}"
+      >
+        ← Back
+      </a>
+      <article class="my-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-10">
+        <p
+          class="text-sm font-semibold uppercase tracking-wider text-amber-700"
+          th:text="${book.author}"
+        >
+          Author
+        </p>
+        <h1
+          class="mt-3 text-4xl font-semibold tracking-tight text-stone-900 sm:text-5xl"
+          th:text="${book.title}"
+        >
+          Title
+        </h1>
+        <p class="mt-6 text-lg leading-8 text-stone-600" th:text="${book.description}">
+          Description
+        </p>
+        <dl class="mt-8 grid grid-cols-[auto_1fr] gap-x-8 gap-y-4 border-y border-stone-200 py-6">
+          <dt class="text-sm text-stone-500" th:text="#{book.isbn}">ISBN</dt>
+          <dd class="font-medium text-stone-900" th:text="${book.isbn}"></dd>
+          <dt class="text-sm text-stone-500" th:text="#{book.author}">Author</dt>
+          <dd class="font-medium text-stone-900" th:text="${book.author}"></dd>
+          <dt class="text-sm text-stone-500" th:text="#{book.price}">Price</dt>
+          <dd
+            class="font-semibold text-stone-900"
+            th:text="${#numbers.formatDecimal(book.price, 1, 2)} + ' ₴'"
+          ></dd>
+        </dl>
+        <p
+          class="mt-6 inline-flex rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-800"
+          th:if="${book.stockQuantity > 0}"
+          th:text="#{book.stock}"
+        ></p>
+        <p
+          class="mt-6 inline-flex rounded-full bg-stone-100 px-3 py-1 text-sm font-semibold text-stone-600"
+          th:unless="${book.stockQuantity > 0}"
+          th:text="#{book.outOfStock}"
+        ></p>
+        <form
+          class="mt-6"
+          th:if="${signedIn and !employee and book.stockQuantity > 0}"
+          th:action="@{/basket/{id}(id=${book.id})}"
+          method="post"
+        >
+          <button
+            class="rounded-lg bg-emerald-800 px-5 py-3 font-semibold text-white hover:bg-emerald-900"
+            th:text="#{book.add}"
+          >
+            Add to basket
+          </button>
+        </form>
+        <a
+          th:if="${!signedIn and book.stockQuantity > 0}"
+          class="mt-6 inline-flex rounded-lg bg-emerald-800 px-5 py-3 font-semibold text-white hover:bg-emerald-900"
+          th:href="@{/login}"
+          th:text="#{common.signInToBuy}"
+        ></a>
+      </article>
+    </main>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+  </body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "build:css": "tailwindcss -i src/main/tailwind.css -o src/main/resources/static/css/app.css --minify",
+    "watch:css": "tailwindcss -i src/main/tailwind.css -o src/main/resources/static/css/app.css --watch",
+    "format:html": "biome format --write src/main/resources/templates",
+    "check:html": "biome ci --formatter-enabled=true --linter-enabled=false --assist-enabled=false src/main/resources/templates"
+  },
+  "dependencies": {
+    "tailwindcss": "4.3.5"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.6.9",
+    "@tailwindcss/cli": "4.3.5"
+  }
+}

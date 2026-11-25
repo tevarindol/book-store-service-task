@@ -1,3 +1,6 @@
 .idea
 .gradle
 build
+.env
+node_modules
+src/main/resources/static/css/app.css

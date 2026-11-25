@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en" th:lang="#{locale.tag}" xmlns:th="http://www.thymeleaf.org">
+  <head th:fragment="head(pageTitle)">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${pageTitle} + ' · ' + #{app.title}">Book Store Service Task</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+  </head>
+  <header th:fragment="header" class="border-b border-stone-200 bg-white">
+    <nav
+      class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8"
+    >
+      <a
+        class="text-xl font-bold tracking-tight text-emerald-950"
+        th:href="@{/books}"
+        th:text="#{app.title}"
+      >
+        Book Store Service Task
+      </a>
+      <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium text-stone-600">
+        <a class="hover:text-emerald-800" th:href="@{/books}" th:text="#{nav.catalog}">Catalog</a>
+        <a
+          class="hover:text-emerald-800"
+          th:if="${signedIn == true and employee == false}"
+          th:href="@{/basket}"
+          th:text="#{nav.basket}"
+        >
+          Basket
+        </a>
+        <a
+          class="hover:text-emerald-800"
+          th:if="${signedIn == true and employee == false}"
+          th:href="@{/orders}"
+          th:text="#{nav.orders}"
+        >
+          My orders
+        </a>
+        <a
+          class="hover:text-emerald-800"
+          th:if="${signedIn == true}"
+          th:href="@{/profile}"
+          th:text="#{nav.profile}"
+        >
+          Profile
+        </a>
+        <a
+          class="hover:text-emerald-800"
+          th:if="${employee == true}"
+          th:href="@{/employee}"
+          th:text="#{nav.employee}"
+        >
+          Employee area
+        </a>
+        <a
+          class="hover:text-emerald-800"
+          th:if="${signedIn == false}"
+          th:href="@{/login}"
+          th:text="#{nav.login}"
+        >
+          Sign in
+        </a>
+        <a
+          class="hover:text-emerald-800"
+          th:if="${signedIn == false}"
+          th:href="@{/register}"
+          th:text="#{nav.register}"
+        >
+          Register
+        </a>
+        <form class="m-0" th:if="${signedIn == true}" th:action="@{/logout}" method="post">
+          <button
+            class="border-0 bg-transparent p-0 font-medium text-emerald-800 hover:text-emerald-950"
+            th:text="#{nav.logout}"
+          >
+            Sign out
+          </button>
+        </form>
+        <span class="flex gap-2 border-l border-stone-200 pl-4">
+          <span class="sr-only" th:text="#{nav.language}"></span>
+          <a class="hover:text-emerald-800" th:href="@{?lang=en}">EN</a>
+          <a class="hover:text-emerald-800" th:href="@{?lang=uk}">UK</a>
+        </span>
+      </div>
+    </nav>
+  </header>
+  <footer th:fragment="footer" class="mt-16 border-t border-stone-200 bg-white">
+    <div class="mx-auto max-w-6xl px-4 py-8 text-sm text-stone-500 sm:px-6 lg:px-8">
+      <span th:text="#{app.title}">Book Store Service Task</span>
+    </div>
+  </footer>
+</html>
