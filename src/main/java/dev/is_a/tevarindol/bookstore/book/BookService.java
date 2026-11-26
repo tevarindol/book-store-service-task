@@ -15,13 +15,7 @@ public class BookService {
 
   @Transactional(readOnly = true)
   public List<Book> availableBooks(String query) {
-    return books.findByActiveTrueOrderByTitleAsc().stream()
-        .filter(
-            book ->
-                query.isBlank()
-                    || book.getTitle().toLowerCase().contains(query.toLowerCase())
-                    || book.getAuthor().toLowerCase().contains(query.toLowerCase()))
-        .toList();
+    return books.searchActive(query);
   }
 
   @Transactional(readOnly = true)

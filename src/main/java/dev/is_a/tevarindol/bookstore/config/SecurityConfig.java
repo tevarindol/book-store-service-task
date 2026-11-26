@@ -14,9 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.savedrequest.NullRequestCache;
 
@@ -26,13 +24,11 @@ public class SecurityConfig {
   @Bean
   SecurityFilterChain securityFilterChain(
       HttpSecurity http,
-      UserDetailsService userDetailsService,
-      JwtDecoder jwtDecoder,
       JwtCookieService jwtCookies,
-      JwtProperties jwtProperties)
+      JwtProperties jwtProperties,
+      AccountJwtAuthenticationConverter jwtAuthenticationConverter,
+      CookieBearerTokenResolver cookieBearerTokenResolver)
       throws Exception {
-    JwtAuthenticationFilter jwtFilter =
-        new JwtAuthenticationFilter(jwtDecoder, userDetailsService, jwtCookies, jwtProperties);
     CookieCsrfTokenRepository csrfTokens = CookieCsrfTokenRepository.withHttpOnlyFalse();
     csrfTokens.setCookiePath("/");
     csrfTokens.setCookieCustomizer(
@@ -58,10 +54,19 @@ public class SecurityConfig {
                     .anyRequest()
                     .authenticated())
         .csrf(csrf -> csrf.csrfTokenRepository(csrfTokens))
+        .oauth2ResourceServer(
+            oauth2 ->
+                oauth2
+                    .bearerTokenResolver(cookieBearerTokenResolver)
+                    .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter))
+                    .authenticationEntryPoint(
+                        (request, response, exception) -> {
+                          jwtCookies.clear(response);
+                          response.sendRedirect("/login");
+                        }))
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .requestCache(cache -> cache.requestCache(new NullRequestCache()))
-        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
         .logout(
             logout ->
                 logout
