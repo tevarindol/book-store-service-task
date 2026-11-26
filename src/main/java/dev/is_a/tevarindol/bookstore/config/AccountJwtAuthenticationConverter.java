@@ -20,7 +20,7 @@ public class AccountJwtAuthenticationConverter
   public AbstractAuthenticationToken convert(Jwt jwt) {
     UserDetails user = users.loadUserByUsername(jwt.getSubject());
     if (!user.isEnabled()) {
-      throw new DisabledException("Account is disabled");
+      throw new DisabledException("auth.accountDisabled");
     }
     return UsernamePasswordAuthenticationToken.authenticated(user, null, user.getAuthorities());
   }
