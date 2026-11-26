@@ -1,7 +1,7 @@
 package dev.is_a.tevarindol.bookstore.config;
 
 import dev.is_a.tevarindol.bookstore.account.AccountRepository;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +20,7 @@ import org.springframework.security.web.savedrequest.NullRequestCache;
 
 @Configuration
 @EnableMethodSecurity
+@EnableConfigurationProperties(SecurityProperties.class)
 public class SecurityConfig {
   @Bean
   SecurityFilterChain securityFilterChain(
@@ -103,7 +104,7 @@ public class SecurityConfig {
   }
 
   @Bean
-  PasswordEncoder passwordEncoder(@Value("${app.security.bcrypt-strength}") int strength) {
-    return new BCryptPasswordEncoder(strength);
+  PasswordEncoder passwordEncoder(SecurityProperties properties) {
+    return new BCryptPasswordEncoder(properties.bcryptStrength());
   }
 }

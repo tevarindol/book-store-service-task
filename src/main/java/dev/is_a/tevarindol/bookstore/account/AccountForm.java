@@ -2,7 +2,6 @@ package dev.is_a.tevarindol.bookstore.account;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,9 +16,7 @@ public class AccountForm {
 
   @NotBlank
   @Size(min = 10, max = 72)
-  @Pattern(
-      regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).+$",
-      message = "{password.pattern}")
+  @PasswordStrength
   private String password;
 
   @NotBlank

@@ -30,6 +30,7 @@ app:
     session-attribute: bookstoreBasket
   security:
     bcrypt-strength: 12
+    password-min-score: 3
     jwt:
       secret: ${JWT_SECRET}
       issuer: book-store-service-task

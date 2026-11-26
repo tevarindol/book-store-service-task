@@ -28,6 +28,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-flyway")
     implementation("org.modelmapper:modelmapper:3.2.4")
+    implementation("com.nulab-inc:zxcvbn:1.9.0")
     implementation("org.flywaydb:flyway-database-postgresql")
     compileOnly("org.projectlombok:lombok:1.18.42")
     annotationProcessor("org.projectlombok:lombok:1.18.42")
