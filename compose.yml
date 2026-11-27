@@ -3,10 +3,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    networks:
-      default:
-        aliases:
-          - bookstore.internal
     depends_on:
       - db
     env_file:
@@ -14,6 +10,23 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: postgres
       DB_HOST: db
+    restart: unless-stopped
+
+  anubis:
+    image: ghcr.io/techarohq/anubis:v1.28.2
+    depends_on:
+      - bookstore
+    environment:
+      BIND: ":8080"
+      TARGET: http://bookstore:8080
+      USE_REMOTE_ADDRESS: "true"
+      COOKIE_SECURE: "${JWT_COOKIE_SECURE:-false}"
+      COOKIE_SAME_SITE: Lax
+      COOKIE_PARTITIONED: "false" # Partitioned cookies require HTTPS on non-localhost hosts.
+    networks:
+      default:
+        aliases:
+          - bookstore.internal
     ports:
       - "8080:8080"
     restart: unless-stopped
@@ -37,7 +50,7 @@ services:
     environment:
       NB_SETUP_KEY: ${NB_SETUP_KEY}
     depends_on:
-      bookstore:
+      anubis:
         condition: service_started
     profiles:
       - tunnel
