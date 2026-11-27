@@ -3,6 +3,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    networks:
+      default:
+        aliases:
+          - tuwunel.internal
     depends_on:
       - db
     env_file:
@@ -24,5 +28,21 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
 
+  netbird:
+    image: docker.io/netbirdio/netbird:0.83.2-rootless
+    hostname: bookstore
+    cap_add: [NET_ADMIN, NET_RAW, SYS_ADMIN, SYS_RESOURCE]
+    volumes:
+      - netbird_data:/var/lib/netbird
+    environment:
+      NB_SETUP_KEY: ${NB_SETUP_KEY}
+    depends_on:
+      bookstore:
+        condition: service_started
+    profiles:
+      - tunnel
+    restart: unless-stopped
+
 volumes:
+  netbird_data:
   postgres_data:
