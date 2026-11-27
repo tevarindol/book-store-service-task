@@ -7,6 +7,15 @@
 
 A bookstore app built with Spring Boot and Thymeleaf for practice. Customers browse the catalog and place orders from their basket. Staff manage the catalog, confirm orders, and can block customer accounts.
 
+## Contents
+
+- [Build](#build)
+- [Configure `.env`](#configure-env)
+- [Run locally](#run-locally)
+- [Run with Podman Compose](#run-with-podman-compose)
+- [Compose diagram](#compose-diagram)
+- [License and author](#license-and-author)
+
 ## Build
 
 You’ll need JDK 17 and Bun. The Gradle Wrapper downloads Gradle for you.
@@ -74,6 +83,34 @@ podman compose logs -f bookstore
 ```
 
 Use `podman compose down` to stop the stack. PostgreSQL data stays in the named volume.
+
+## Compose diagram
+
+```mermaid
+flowchart LR
+    local["Local browser: localhost:8080"]
+    proxy["NetBird Reverse Proxy"]
+
+    subgraph compose["Compose network"]
+        subgraph tunnel["Optional tunnel profile"]
+            netbird["NetBird"]
+        end
+        anubis["Anubis"]
+        app["Book Store app"]
+        db["PostgreSQL"]
+
+        netbird -->|"bookstore.internal:8080"| anubis
+        anubis -->|"bookstore:8080"| app
+        app -->|"db:5432"| db
+    end
+
+    local -->|"Published port 8080"| anubis
+    proxy --> netbird
+```
+
+To enable the NetBird entry point, set `NB_SETUP_KEY` in `.env` and run `podman compose --profile tunnel up -d`. Configure the NetBird Reverse Proxy separately to reach `bookstore.internal:8080` through the NetBird container.
+
+From the host, use `localhost:8080` to reach Anubis. The Compose port mapping is not limited to the loopback interface.
 
 ## License and author
 
