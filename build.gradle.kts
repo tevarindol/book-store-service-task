@@ -43,6 +43,9 @@ dependencies {
 tasks.withType<Test> {
     useJUnitPlatform()
     environment("JWT_SECRET", "test-only-jwt-secret-do-not-use-outside-tests")
+    environment("SPRING_FLYWAY_PLACEHOLDERS_EMPLOYEEHASH",
+        $$"$2b$12$c37hnZLmP3oRD2hMRZUBfu9zBKC1oEC1Hv6..MGM41o30e85jBeIe"
+    )
 }
 
 spotless {
