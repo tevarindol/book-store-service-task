@@ -9,7 +9,7 @@ COPY src/main/tailwind.css ./src/main/tailwind.css
 COPY src/main/resources/templates ./src/main/resources/templates
 RUN mkdir -p src/main/resources/static/css && bun run build:css
 
-FROM docker.io/library/gradle:9.9.2-jdk17-alpine AS backend
+FROM docker.io/library/gradle:9.9.2-jdk17-corretto AS backend
 
 WORKDIR /workspace
 USER root
