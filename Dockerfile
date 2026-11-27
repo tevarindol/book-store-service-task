@@ -25,7 +25,7 @@ RUN --mount=type=cache,id=gradle-wrapper,target=/root/.gradle/wrapper \
     --mount=type=cache,id=gradle-caches,target=/root/.gradle/caches \
     ./gradlew --no-daemon bootJar
 
-FROM docker.io/library/eclipse-temurin:17-jre-alpine AS runtime
+FROM docker.io/library/amazoncorretto:17.0.21-alpine3.24 AS runtime
 
 WORKDIR /app
 RUN addgroup -S app && adduser -S -G app app
