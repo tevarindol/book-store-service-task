@@ -1,4 +1,4 @@
-FROM oven/bun:1-alpine AS frontend
+FROM docker.io/oven/bun:1-alpine AS frontend
 
 WORKDIR /workspace
 
@@ -9,7 +9,7 @@ COPY src/main/tailwind.css ./src/main/tailwind.css
 COPY src/main/resources/templates ./src/main/resources/templates
 RUN mkdir -p src/main/resources/static/css && bun run build:css
 
-FROM gradle:9.9.2-jdk17-alpine AS backend
+FROM docker.io/library/gradle:9.9.2-jdk17-alpine AS backend
 
 WORKDIR /workspace
 USER root
@@ -25,7 +25,7 @@ RUN --mount=type=cache,id=gradle-wrapper,target=/root/.gradle/wrapper \
     --mount=type=cache,id=gradle-caches,target=/root/.gradle/caches \
     ./gradlew --no-daemon bootJar
 
-FROM eclipse-temurin:17-jre-alpine AS runtime
+FROM docker.io/library/eclipse-temurin:17-jre-alpine AS runtime
 
 WORKDIR /app
 RUN addgroup -S app && adduser -S -G app app
