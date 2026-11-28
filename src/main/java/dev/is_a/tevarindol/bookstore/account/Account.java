@@ -74,8 +74,4 @@ public class Account {
     this.lastName = lastName;
     this.phone = phone;
   }
-
-  public void changePassword(String passwordHash) {
-    this.passwordHash = passwordHash;
-  }
 }

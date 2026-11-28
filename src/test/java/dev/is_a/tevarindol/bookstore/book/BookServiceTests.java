@@ -66,21 +66,17 @@ class BookServiceTests {
     Book inactive = create(form("FIND-2", "Book B", false));
 
     assertThat(service.get(active.getId()).getId()).isEqualTo(active.getId());
-    assertThat(service.getBookByName("bOOK a").getId()).isEqualTo(active.getId());
     assertThat(service.getIncludingInactive(inactive.getId()).isActive()).isFalse();
 
     assertNotFound(() -> service.get(inactive.getId()));
     assertNotFound(() -> service.get(-1L));
-    assertNotFound(() -> service.getBookByName("Book B"));
-    assertNotFound(() -> service.getBookByName("Book C"));
     assertNotFound(() -> service.getIncludingInactive(-1L));
   }
 
   @Test
-  void addBookPersistsFormAndCreateRejectsDuplicateIsbnIgnoringCase() {
+  void createPersistsFormAndRejectsDuplicateIsbnIgnoringCase() {
     BookForm form = form("ISBN-ADD", "  Book A  ", true);
-    Book added = service.addBook(form);
-    createdBookIds.add(added.getId());
+    Book added = create(form);
 
     Book stored = service.get(added.getId());
     assertThat(stored.getIsbn()).isEqualTo("ISBN-ADD");
@@ -90,9 +86,6 @@ class BookServiceTests {
     assertThat(stored.getPrice()).isEqualByComparingTo(form.getPrice());
     assertThat(stored.getStockQuantity()).isEqualTo(form.getStockQuantity());
     assertThatThrownBy(() -> service.create(form("isbn-add", "Book B", true)))
-        .isInstanceOf(ConflictException.class)
-        .hasMessage("error.duplicateIsbn");
-    assertThatThrownBy(() -> service.addBook(form("isbn-add", "Book B", true)))
         .isInstanceOf(ConflictException.class)
         .hasMessage("error.duplicateIsbn");
   }
@@ -133,53 +126,20 @@ class BookServiceTests {
   }
 
   @Test
-  void updateByNameFindsOnlyActiveBooksIgnoringCase() {
-    Book active = create(form("NAMED-1", "Book A", true));
-    create(form("NAMED-2", "Book B", false));
-    BookForm updated = form("NAMED-1", "Book C", true);
-
-    assertThat(service.updateBookByName("book a", updated).getId()).isEqualTo(active.getId());
-    assertThat(service.get(active.getId()).getTitle()).isEqualTo("Book C");
-    assertNotFound(() -> service.updateBookByName("Book B", updated));
-    assertNotFound(() -> service.updateBookByName("Book D", updated));
-  }
-
-  @Test
-  void updateByNameRejectsDuplicateIsbnWithoutChangingBook() {
-    Book target = create(form("NAMED-1", "Book A", true));
-    create(form("NAMED-2", "Book B", true));
-
-    assertThatThrownBy(() -> service.updateBookByName("Book A", form("named-2", "Book C", false)))
-        .isInstanceOf(ConflictException.class)
-        .hasMessage("error.duplicateIsbn");
-
-    Book stored = service.get(target.getId());
-    assertThat(stored.getIsbn()).isEqualTo("NAMED-1");
-    assertThat(stored.getTitle()).isEqualTo("Book A");
-  }
-
-  @Test
   void updateAndDeactivateRejectMissingId() {
     assertNotFound(() -> service.update(-1L, form("UPDATE-1", "Book A", true)));
     assertNotFound(() -> service.deactivate(-1L));
   }
 
   @Test
-  void deactivationByIdOrNameHidesBookWithoutDeletingIt() {
+  void deactivationByIdHidesBookWithoutDeletingIt() {
     Book byId = create(form("REMOVE-1", "Book A", true));
-    Book byName = create(form("REMOVE-2", "Book B", true));
 
     service.deactivate(byId.getId());
     service.deactivate(byId.getId());
-    service.deleteBookByName("book b");
 
     assertThat(service.getIncludingInactive(byId.getId()).isActive()).isFalse();
-    assertThat(service.getIncludingInactive(byName.getId()).isActive()).isFalse();
-    assertThat(service.availableBooks("Book"))
-        .extracting(Book::getId)
-        .doesNotContain(byId.getId(), byName.getId());
-    assertNotFound(() -> service.deleteBookByName("Book B"));
-    assertNotFound(() -> service.deleteBookByName("Book C"));
+    assertThat(service.availableBooks("Book")).extracting(Book::getId).doesNotContain(byId.getId());
   }
 
   private Book create(BookForm form) {

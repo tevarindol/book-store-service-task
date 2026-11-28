@@ -31,7 +31,6 @@ public class OrderItem {
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "book_id", nullable = false)
-  @Getter
   private Book book;
 
   @Column(name = "book_title", nullable = false)
@@ -39,7 +38,6 @@ public class OrderItem {
   private String bookTitle;
 
   @Column(name = "unit_price", nullable = false, precision = 10, scale = 2)
-  @Getter
   private BigDecimal unitPrice;
 
   @Column(nullable = false)

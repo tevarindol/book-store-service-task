@@ -13,11 +13,6 @@ public interface OrderRepository extends JpaRepository<StoreOrder, Long> {
           + "WHERE LOWER(o.customer.email) = LOWER(:email) ORDER BY o.createdAt DESC")
   List<Long> findIdsForCustomer(@Param("email") String email);
 
-  @Query(
-      "SELECT o.id FROM StoreOrder o "
-          + "WHERE LOWER(o.employee.email) = LOWER(:email) ORDER BY o.createdAt DESC")
-  List<Long> findIdsForEmployee(@Param("email") String email);
-
   @Query("SELECT o.id FROM StoreOrder o ORDER BY o.createdAt DESC")
   List<Long> findAllIdsSorted();
 

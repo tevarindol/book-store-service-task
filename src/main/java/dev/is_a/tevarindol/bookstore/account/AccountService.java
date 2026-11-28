@@ -39,10 +39,6 @@ public class AccountService {
     return accounts.save(account);
   }
 
-  public Account updateProfile(String email, AccountForm form) {
-    return updateProfileFields(email, form.getFirstName(), form.getLastName(), form.getPhone());
-  }
-
   public Account updateProfileFields(
       String email, String firstName, String lastName, String phone) {
     Account account = getByEmail(email);

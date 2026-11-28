@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.savedrequest.NullRequestCache;
 
 @Configuration
@@ -54,7 +56,18 @@ public class SecurityConfig {
                     .authenticated()
                     .anyRequest()
                     .authenticated())
-        .csrf(csrf -> csrf.csrfTokenRepository(csrfTokens))
+        .csrf(
+            csrf ->
+                csrf.csrfTokenRepository(csrfTokens)
+                    .withObjectPostProcessor(
+                        new ObjectPostProcessor<CsrfFilter>() {
+                          @Override
+                          public <O extends CsrfFilter> O postProcess(O filter) {
+                            // Cookie-based bearer authentication still needs CSRF protection.
+                            filter.setRequireCsrfProtectionMatcher(CsrfFilter.DEFAULT_CSRF_MATCHER);
+                            return filter;
+                          }
+                        }))
         .oauth2ResourceServer(
             oauth2 ->
                 oauth2
@@ -100,7 +113,7 @@ public class SecurityConfig {
                         .roles(account.getRole().name())
                         .disabled(account.isBlocked())
                         .build())
-            .orElseThrow(() -> new UsernameNotFoundException("Account not found"));
+            .orElseThrow(() -> new UsernameNotFoundException("error.accountNotFound"));
   }
 
   @Bean

@@ -70,23 +70,6 @@ class AccountServiceTests {
   }
 
   @Test
-  void updateProfileUsesFormFields() {
-    Account customer = register("profile-form@example.com", AccountRole.CUSTOMER);
-    AccountForm form = new AccountForm();
-    form.setFirstName("  New first  ");
-    form.setLastName("  New last  ");
-    form.setPhone("+38012345");
-
-    Account updated = service.updateProfile(customer.getEmail(), form);
-
-    Account stored = reload(customer);
-    assertThat(updated.getId()).isEqualTo(customer.getId());
-    assertThat(stored.getFirstName()).isEqualTo("New first");
-    assertThat(stored.getLastName()).isEqualTo("New last");
-    assertThat(stored.getPhone()).isEqualTo("+38012345");
-  }
-
-  @Test
   void getByEmailIgnoresCase() {
     Account customer = register("lookup@example.com", AccountRole.CUSTOMER);
 

@@ -20,16 +20,4 @@ class AccountTests {
     assertThat(account.getRole()).isEqualTo(AccountRole.CUSTOMER);
     assertThat(account.getPasswordHash()).isEqualTo("old-hash");
   }
-
-  @Test
-  void changePasswordReplacesHashWithoutChangingProfile() {
-    account.changePassword("new-hash");
-
-    assertThat(account.getPasswordHash()).isEqualTo("new-hash");
-    assertThat(account.getEmail()).isEqualTo("reader@example.com");
-    assertThat(account.getFirstName()).isEqualTo("Ada");
-    assertThat(account.getLastName()).isEqualTo("Reed");
-    assertThat(account.getPhone()).isEqualTo("+38012345");
-    assertThat(account.getRole()).isEqualTo(AccountRole.CUSTOMER);
-  }
 }

@@ -5,6 +5,7 @@ import dev.is_a.tevarindol.bookstore.book.BookForm;
 import dev.is_a.tevarindol.bookstore.book.BookService;
 import dev.is_a.tevarindol.bookstore.client.ClientService;
 import dev.is_a.tevarindol.bookstore.common.ConflictException;
+import dev.is_a.tevarindol.bookstore.common.NotFoundException;
 import dev.is_a.tevarindol.bookstore.order.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -128,7 +129,10 @@ public class EmployeeController {
   @PostMapping("/customers/{id}/block")
   public String toggleBlock(@PathVariable long id) {
     var account =
-        clients.getAllClients().stream().filter(c -> c.getId() == id).findFirst().orElseThrow();
+        clients.getAllClients().stream()
+            .filter(c -> c.getId() == id)
+            .findFirst()
+            .orElseThrow(() -> new NotFoundException("error.customerNotFound"));
     clients.blockClient(id, !account.isBlocked());
     return "redirect:/employee/customers";
   }

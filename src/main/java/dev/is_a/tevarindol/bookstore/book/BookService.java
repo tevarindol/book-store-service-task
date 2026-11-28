@@ -31,13 +31,6 @@ public class BookService {
   }
 
   @Transactional(readOnly = true)
-  public Book getBookByName(String name) {
-    return books
-        .findByTitleIgnoreCaseAndActiveTrue(name)
-        .orElseThrow(() -> new NotFoundException("error.bookNotFound"));
-  }
-
-  @Transactional(readOnly = true)
   public Book getIncludingInactive(long id) {
     return books.findById(id).orElseThrow(() -> new NotFoundException("error.bookNotFound"));
   }
@@ -48,10 +41,6 @@ public class BookService {
     return books.save(new Book(form));
   }
 
-  public Book addBook(BookForm form) {
-    return create(form);
-  }
-
   public Book update(long id, BookForm form) {
     Book book = getIncludingInactive(id);
     if (books.existsByIsbnIgnoreCaseAndIdNot(form.getIsbn(), id))
@@ -60,16 +49,7 @@ public class BookService {
     return book;
   }
 
-  public Book updateBookByName(String name, BookForm form) {
-    Book book = getBookByName(name);
-    return update(book.getId(), form);
-  }
-
   public void deactivate(long id) {
     getIncludingInactive(id).updateActive(false);
-  }
-
-  public void deleteBookByName(String name) {
-    deactivate(getBookByName(name).getId());
   }
 }

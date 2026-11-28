@@ -60,16 +60,6 @@ public class OrderService {
     return submit(customerEmail, requested);
   }
 
-  @Transactional(readOnly = true)
-  public List<StoreOrder> getAllOrdersByClient(String email) {
-    return forCustomer(email);
-  }
-
-  @Transactional(readOnly = true)
-  public List<StoreOrder> getAllOrdersByEmployee(String email) {
-    return forEmployee(email);
-  }
-
   public StoreOrder confirm(long id, String employeeEmail) {
     StoreOrder order =
         orders.findById(id).orElseThrow(() -> new NotFoundException("error.orderNotFound"));
@@ -85,11 +75,6 @@ public class OrderService {
   @Transactional(readOnly = true)
   public List<StoreOrder> forCustomer(String email) {
     return loadDetailed(orders.findIdsForCustomer(email));
-  }
-
-  @Transactional(readOnly = true)
-  public List<StoreOrder> forEmployee(String email) {
-    return loadDetailed(orders.findIdsForEmployee(email));
   }
 
   @Transactional(readOnly = true)
