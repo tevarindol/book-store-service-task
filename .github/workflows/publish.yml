@@ -1,0 +1,21 @@
+name: Publish Container Image to GHCR
+
+on:
+  workflow_call:
+
+jobs:
+  build:
+    uses: docker/github-builder/.github/workflows/build.yml@v1.20.0
+    with:
+      output: image
+      push: true
+      sign: 'false'
+      meta-images: ghcr.io/${{ github.repository }}
+      meta-tags: type=ref,event=tag
+      meta-flavor: latest=false
+      set-meta-labels: true
+    secrets:
+      registry-auths: |
+        - registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}

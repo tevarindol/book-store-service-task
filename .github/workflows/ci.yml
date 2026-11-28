@@ -87,3 +87,11 @@ jobs:
 
       - name: Run test suite
         run: ./gradlew test
+
+  publish:
+    needs: [frontend-checks, java-format, test-suite]
+    if: github.event_name == 'push' && github.ref_type == 'tag' && !github.event.deleted
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/publish.yml
