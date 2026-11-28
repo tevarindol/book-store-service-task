@@ -11,14 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
-@Slf4j
 public class OrderService {
   private final OrderRepository orders;
   private final AccountRepository accounts;
@@ -39,9 +37,7 @@ public class OrderService {
       book.takeFromStock(entry.getValue());
       items.add(new OrderItem(book, entry.getValue()));
     }
-    StoreOrder order = orders.save(new StoreOrder(customer, items));
-    log.info("Order {} submitted by {}", order.getId(), customerEmail);
-    return order;
+    return orders.save(new StoreOrder(customer, items));
   }
 
   public StoreOrder addOrder(String customerEmail, OrderDTO orderDto) {
@@ -68,7 +64,6 @@ public class OrderService {
             .findByEmailIgnoreCase(employeeEmail)
             .orElseThrow(() -> new NotFoundException("error.employeeNotFound"));
     order.confirm(employee);
-    log.info("Order {} confirmed by {}", id, employeeEmail);
     return order;
   }
 

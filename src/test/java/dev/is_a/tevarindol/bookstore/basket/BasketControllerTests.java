@@ -25,6 +25,7 @@ import dev.is_a.tevarindol.bookstore.common.BadRequestException;
 import dev.is_a.tevarindol.bookstore.common.GlobalExceptionHandler;
 import dev.is_a.tevarindol.bookstore.order.OrderDTO;
 import dev.is_a.tevarindol.bookstore.order.OrderService;
+import dev.is_a.tevarindol.bookstore.order.StoreOrder;
 import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -129,6 +130,9 @@ class BasketControllerTests {
 
   @Test
   void checkoutSubmitsAllLinesForCurrentCustomerAndClearsBasket() throws Exception {
+    var submitted = mock(StoreOrder.class);
+    when(submitted.getId()).thenReturn(17L);
+    when(orders.addOrder(eq(EMAIL), any(OrderDTO.class))).thenReturn(submitted);
     basket.add(session, 42L);
     basket.add(session, 42L);
     basket.add(session, 7L);

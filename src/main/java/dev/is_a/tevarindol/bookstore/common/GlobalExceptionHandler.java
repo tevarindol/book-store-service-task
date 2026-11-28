@@ -2,6 +2,7 @@ package dev.is_a.tevarindol.bookstore.common;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Locale;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @ControllerAdvice
@@ -75,7 +77,12 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public String unexpected(
       Exception exception, Model model, HttpServletRequest request, Locale locale) {
-    log.error("Request failed: {} {}", request.getMethod(), request.getRequestURI(), exception);
+    var route = request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+    log.error(
+        "Request failed: {} {}",
+        request.getMethod(),
+        Objects.toString(route, "<unmatched>"),
+        exception);
     model.addAttribute("status", 500);
     model.addAttribute("message", message("error.unexpected", locale));
     return "error/error";

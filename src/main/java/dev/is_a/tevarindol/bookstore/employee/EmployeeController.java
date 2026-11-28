@@ -9,6 +9,7 @@ import dev.is_a.tevarindol.bookstore.common.NotFoundException;
 import dev.is_a.tevarindol.bookstore.order.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -26,6 +27,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/employee")
 @PreAuthorize("hasRole('EMPLOYEE')")
 @RequiredArgsConstructor
+@Slf4j
 public class EmployeeController {
   private final BookService books;
   private final OrderService orders;
@@ -116,6 +118,7 @@ public class EmployeeController {
   public String confirmOrder(
       @PathVariable long id, Authentication authentication, RedirectAttributes redirect) {
     orders.confirm(id, authentication.getName());
+    log.info("Order {} confirmed", id);
     redirect.addFlashAttribute("notice", "order.confirmed");
     return "redirect:/employee/orders";
   }
@@ -133,7 +136,9 @@ public class EmployeeController {
             .filter(c -> c.getId() == id)
             .findFirst()
             .orElseThrow(() -> new NotFoundException("error.customerNotFound"));
-    clients.blockClient(id, !account.isBlocked());
+    boolean blocked = !account.isBlocked();
+    clients.blockClient(id, blocked);
+    log.info("Customer {} {}", id, blocked ? "blocked" : "unblocked");
     return "redirect:/employee/customers";
   }
 

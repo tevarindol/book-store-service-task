@@ -23,11 +23,13 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Entity
 @Table(name = "orders")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Slf4j
 public class StoreOrder {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -67,8 +69,10 @@ public class StoreOrder {
   }
 
   public void confirm(Account employee) {
-    if (status != OrderStatus.SUBMITTED)
+    if (status != OrderStatus.SUBMITTED) {
+      log.debug("Order confirmation rejected: orderId={}, status={}", id, status);
       throw new BadRequestException("error.confirmSubmittedOrder");
+    }
     this.status = OrderStatus.CONFIRMED;
     this.employee = employee;
     this.confirmedAt = LocalDateTime.now();

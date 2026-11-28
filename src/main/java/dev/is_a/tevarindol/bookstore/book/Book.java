@@ -11,11 +11,13 @@ import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Entity
 @Table(name = "books")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Slf4j
 public class Book {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,8 +59,14 @@ public class Book {
   }
 
   public void takeFromStock(int quantity) {
-    if (quantity < 1 || stockQuantity < quantity)
+    if (quantity < 1 || stockQuantity < quantity) {
+      log.debug(
+          "Stock deduction rejected: bookId={}, requested={}, available={}",
+          id,
+          quantity,
+          stockQuantity);
       throw new BadRequestException("error.insufficientStock");
+    }
     stockQuantity -= quantity;
   }
 

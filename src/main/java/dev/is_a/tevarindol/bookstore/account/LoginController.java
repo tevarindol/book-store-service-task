@@ -5,6 +5,7 @@ import dev.is_a.tevarindol.bookstore.config.JwtTokenService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class LoginController {
   private final AuthenticationManager authenticationManager;
   private final JwtTokenService tokens;
@@ -34,6 +36,7 @@ public class LoginController {
       cookies.writeToken(response, tokens.issue(authentication));
       return "redirect:/books";
     } catch (AuthenticationException exception) {
+      log.debug("Login rejected: {}", exception.getClass().getSimpleName());
       cookies.clear(response);
       return "redirect:/login?error";
     }

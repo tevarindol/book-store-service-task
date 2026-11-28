@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class BasketController {
   private final BasketService basket;
   private final BookService books;
@@ -64,7 +66,8 @@ public class BasketController {
             basket.get(session).entrySet().stream()
                 .map(entry -> new OrderDTO.OrderLineDTO(entry.getKey(), entry.getValue()))
                 .toList());
-    orders.addOrder(authentication.getName(), orderDto);
+    var order = orders.addOrder(authentication.getName(), orderDto);
+    log.info("Order {} submitted", order.getId());
     basket.clear(session);
     redirect.addFlashAttribute("notice", "order.submitted");
     return "redirect:/orders";

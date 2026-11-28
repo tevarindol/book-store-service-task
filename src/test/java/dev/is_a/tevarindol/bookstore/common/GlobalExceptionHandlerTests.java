@@ -1,5 +1,6 @@
 package dev.is_a.tevarindol.bookstore.common;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -8,9 +9,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Locale;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.context.support.StaticMessageSource;
 import org.springframework.core.MethodParameter;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -42,6 +47,22 @@ class GlobalExceptionHandlerTests {
         .andExpect(view().name("error/error"))
         .andExpect(model().attribute("status", expectedStatus))
         .andExpect(model().attribute("message", message));
+  }
+
+  @Test
+  @ExtendWith(OutputCaptureExtension.class)
+  void unexpectedFailureLogsRouteTemplateWithoutRequestData(CapturedOutput output)
+      throws Exception {
+    mvc.perform(
+            get("/failure/{email}", "reader@example.com")
+                .queryParam("token", "sample-token")
+                .requestAttr("failure", new IllegalStateException("Internal failure")))
+        .andExpect(status().isInternalServerError());
+
+    assertThat(output.getAll())
+        .containsOnlyOnce("Request failed: GET /failure/{email}")
+        .contains("java.lang.IllegalStateException: Internal failure")
+        .doesNotContain("reader@example.com", "sample-token");
   }
 
   private static Stream<Arguments> errors() throws NoSuchMethodException {
@@ -84,7 +105,7 @@ class GlobalExceptionHandlerTests {
 
   @Controller
   class FailingController {
-    @GetMapping("/failure")
+    @GetMapping({"/failure", "/failure/{email}"})
     String fail(@RequestAttribute("failure") Exception failure) throws Exception {
       throw failure;
     }
